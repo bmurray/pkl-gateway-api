@@ -47,9 +47,7 @@
 @ModuleInfo { minPklVersion = "0.25.0" }
 abstract module gateway.GatewayResource
 
-import "@k8s/K8sObject.pkl"
-
-extends "K8sObject.pkl"
+extends "@k8s/K8sObject.pkl"
 
 /// APIVersion defines the versioned schema of this representation of an object.
 fixed apiVersion: String
