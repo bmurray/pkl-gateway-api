@@ -1,0 +1,11 @@
+# Generated output
+generated-package/
+
+# Go build artifacts
+bin/
+*.exe
+
+# IDE
+.idea/
+.vscode/
+*.swp
