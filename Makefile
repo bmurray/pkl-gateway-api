@@ -25,3 +25,8 @@ clean:
 .PHONY: test
 test:
 	go test ./...
+
+.PHONY: examples
+examples:
+	cd examples/simple && pkl project resolve && pkl eval gateway.pkl -f yaml > gateway.yaml
+	@echo "Generated examples/simple/gateway.yaml"

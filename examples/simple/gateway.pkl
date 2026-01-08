@@ -1,0 +1,115 @@
+/// Simple Gateway API example demonstrating GatewayClass, Gateway, and HTTPRoute.
+///
+/// This example creates:
+/// - A GatewayClass defining the controller
+/// - A Gateway with HTTP and HTTPS listeners
+/// - An HTTPRoute with multiple path-based routing rules
+module gateway
+
+import "@k8s-gateway/gateway.networking.k8s.io/v1/GatewayClass.pkl"
+import "@k8s-gateway/gateway.networking.k8s.io/v1/Gateway.pkl"
+import "@k8s-gateway/gateway.networking.k8s.io/v1/HTTPRoute.pkl"
+
+output {
+  value = resources
+  renderer = new YamlRenderer {
+    isStream = true
+  }
+}
+
+local gatewayClass = new GatewayClass {
+  metadata {
+    name = "example-gateway-class"
+  }
+  spec {
+    controllerName = "example.com/gateway-controller"
+  }
+}
+
+local gateway = new Gateway {
+  metadata {
+    name = "example-gateway"
+    namespace = "default"
+  }
+  spec {
+    gatewayClassName = "example-gateway-class"
+    listeners {
+      new {
+        name = "http"
+        port = 80
+        protocol = "HTTP"
+      }
+      new {
+        name = "https"
+        port = 443
+        protocol = "HTTPS"
+        tls {
+          mode = "Terminate"
+          certificateRefs {
+            new {
+              name = "example-cert"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+local httpRoute = new HTTPRoute {
+  metadata {
+    name = "example-route"
+    namespace = "default"
+  }
+  spec {
+    parentRefs {
+      new {
+        name = "example-gateway"
+      }
+    }
+    hostnames {
+      "example.com"
+      "www.example.com"
+    }
+    rules {
+      new {
+        matches {
+          new {
+            path {
+              type = "PathPrefix"
+              value = "/api"
+            }
+          }
+        }
+        backendRefs {
+          new {
+            name = "api-service"
+            port = 8080
+          }
+        }
+      }
+      new {
+        matches {
+          new {
+            path {
+              type = "PathPrefix"
+              value = "/"
+            }
+          }
+        }
+        backendRefs {
+          new {
+            name = "frontend-service"
+            port = 80
+          }
+        }
+      }
+    }
+  }
+}
+
+resources = new Listing {
+  gatewayClass
+  gateway
+  httpRoute
+}

@@ -1,6 +1,10 @@
 # Generated output
 generated-package/
 
+# Example generated files
+examples/**/gateway.yaml
+examples/**/*.deps.json
+
 # Go build artifacts
 bin/
 *.exe
