@@ -1,15 +1,12 @@
 VERSION ?= v1.4.1
 K8S_VERSION ?= 1.3.0
-RELEASE_TAG ?=
+RELEASE_TAG ?= dev
 OUTPUT_DIR ?= generated-package
 EXPERIMENTAL ?= false
 
 .PHONY: generate clean build
 
 generate: build
-ifndef RELEASE_TAG
-	$(error RELEASE_TAG is required. Usage: make generate RELEASE_TAG=v0.2.0)
-endif
 ifeq ($(EXPERIMENTAL),true)
 	./bin/generate --version=$(VERSION) --k8s-version=$(K8S_VERSION) --release-tag=$(RELEASE_TAG) --output=$(OUTPUT_DIR) --experimental
 else
