@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Setup Pkl
+        uses: pkl-community/setup-pkl@v0
+        with:
+          pkl-version: '0.27.1'
+
+      - name: Build generator
+        run: go build ./cmd/generate
+
+      - name: Generate Pkl modules
+        run: make generate
+
+      - name: Verify Pkl modules
+        run: |
+          cd generated-package
+          pkl project resolve
+          pkl eval gateway.networking.k8s.io/v1/HTTPRoute.pkl -f yaml
+
+      - name: Test packaging
+        run: |
+          cd generated-package
+          pkl project package --output-path ../dist
+          ls -la ../dist/
