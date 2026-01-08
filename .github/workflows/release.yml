@@ -25,18 +25,6 @@ jobs:
         with:
           pkl-version: '0.27.1'
 
-      - name: Extract version from tag
-        id: version
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          # Strip 'v' prefix for package version
-          PKG_VERSION=${VERSION#v}
-          echo "pkg_version=$PKG_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Update VERSION file
-        run: echo "${{ steps.version.outputs.pkg_version }}" > VERSION
-
       - name: Generate Pkl modules
         run: make generate
 

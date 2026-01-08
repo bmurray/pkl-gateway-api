@@ -24,15 +24,10 @@ func main() {
 	experimental := flag.Bool("experimental", false, "Include experimental resources")
 	flag.Parse()
 
-	// Read package version from VERSION file if not specified
+	// Package version is derived from Gateway API version (strip 'v' prefix)
 	pv := *pkgVersion
 	if pv == "" {
-		data, err := os.ReadFile("VERSION")
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error reading VERSION file: %v\n", err)
-			os.Exit(1)
-		}
-		pv = strings.TrimSpace(string(data))
+		pv = strings.TrimPrefix(*version, "v")
 	}
 
 	if err := run(*version, *k8sVersion, pv, *outputDir, *templatesDir, *experimental); err != nil {

@@ -40,7 +40,7 @@ dependencies {
     uri = "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.3.0"
   }
   ["k8s-gateway"] {
-    uri = "package://github.com/bmurray/pkl-gateway-api/gateway-api@0.1.0"
+    uri = "package://github.com/bmurray/pkl-gateway-api/gateway-api@1.4.1"
   }
 }
 ```
