@@ -40,6 +40,11 @@ jobs:
       - name: Generate Pkl modules
         run: make generate
 
+      - name: Resolve Pkl dependencies
+        run: |
+          cd generated-package
+          pkl project resolve
+
       - name: Package Pkl project
         run: |
           cd generated-package
