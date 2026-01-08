@@ -36,14 +36,16 @@ type Generator struct {
 	outputDir  string
 	version    string
 	k8sVersion string
+	releaseTag string
 }
 
 // NewGenerator creates a new Generator.
-func NewGenerator(outputDir, version, k8sVersion string) *Generator {
+func NewGenerator(outputDir, version, k8sVersion, releaseTag string) *Generator {
 	return &Generator{
 		outputDir:  outputDir,
 		version:    version,
 		k8sVersion: k8sVersion,
+		releaseTag: releaseTag,
 	}
 }
 
@@ -201,6 +203,7 @@ func (g *Generator) CopyBaseTemplates(templatesDir string) error {
 	err = tmpl.Execute(&buf, map[string]string{
 		"Version":    g.version,
 		"K8sVersion": g.k8sVersion,
+		"ReleaseTag": g.releaseTag,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to execute PklProject template: %w", err)

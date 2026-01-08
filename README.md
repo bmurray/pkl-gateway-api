@@ -4,31 +4,15 @@ Pkl templates for [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) res
 
 ## Overview
 
-This project generates type-safe Pkl modules from the Gateway API CustomResourceDefinitions (CRDs). The generated templates can be used to configure Gateway API resources like HTTPRoute, Gateway, GatewayClass, and more.
+Type-safe Pkl modules for Gateway API resources like HTTPRoute, Gateway, GatewayClass, and more. Generated from the official Gateway API CRDs.
 
-## Requirements
+## Installation
 
-- Go 1.22+
+### Requirements
+
 - [Pkl](https://pkl-lang.org/) 0.25.0+
 
-## Usage
-
-### Generating Templates
-
-```bash
-# Generate from Gateway API v1.4.1 (default)
-make generate
-
-# Generate from a specific version
-make generate VERSION=v1.3.0
-
-# Include experimental resources (TCPRoute, TLSRoute, UDPRoute)
-make generate VERSION=v1.4.1 EXPERIMENTAL=true
-```
-
-### Using Generated Templates
-
-#### 1. Add Dependencies to Your PklProject
+### Add to Your PklProject
 
 Add both `k8s` and `k8s-gateway` to your `PklProject` file:
 
@@ -40,7 +24,7 @@ dependencies {
     uri = "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.3.0"
   }
   ["k8s-gateway"] {
-    uri = "package://github.com/bmurray/pkl-gateway-api/gateway-api@1.4.1"
+    uri = "package://github.com/bmurray/pkl-gateway-api/releases/download/v0.2.0/gateway-api@1.4.1"
   }
 }
 ```
@@ -51,7 +35,9 @@ Then resolve dependencies:
 pkl project resolve
 ```
 
-#### 2. Create Resources Using Shortname Imports
+## Usage
+
+### Create Resources Using Shortname Imports
 
 Example HTTPRoute configuration using the `@k8s-gateway` shortname:
 
@@ -93,7 +79,7 @@ spec {
 }
 ```
 
-#### 3. Render to YAML
+### Render to YAML
 
 ```bash
 pkl eval my-route.pkl -f yaml
@@ -143,7 +129,37 @@ spec:
 | TLSRoute | v1alpha2 |
 | UDPRoute | v1alpha2 |
 
-## Project Structure
+## Versioning
+
+The package URI follows this format:
+```
+package://github.com/bmurray/pkl-gateway-api/releases/download/{release-tag}/gateway-api@{gateway-api-version}
+```
+
+- **release-tag**: Our release version (e.g., `v0.2.0`)
+- **gateway-api-version**: The Gateway API version the templates are generated from (e.g., `1.4.1`)
+
+## Development
+
+### Requirements
+
+- Go 1.22+
+- [Pkl](https://pkl-lang.org/) 0.25.0+
+
+### Generating Templates
+
+```bash
+# Generate from Gateway API v1.4.1 (default)
+make generate RELEASE_TAG=v0.2.0
+
+# Generate from a specific Gateway API version
+make generate VERSION=v1.3.0 RELEASE_TAG=v0.2.0
+
+# Include experimental resources (TCPRoute, TLSRoute, UDPRoute)
+make generate VERSION=v1.4.1 RELEASE_TAG=v0.2.0 EXPERIMENTAL=true
+```
+
+### Project Structure
 
 ```
 pkl-gateway-api/
@@ -154,7 +170,6 @@ pkl-gateway-api/
 │   └── generator/      # Pkl module generation
 ├── templates/          # Base Pkl templates
 ├── generated-package/  # Generated output (gitignored)
-├── VERSION             # Package version
 └── Makefile
 ```
 

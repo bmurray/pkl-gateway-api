@@ -25,8 +25,12 @@ jobs:
         with:
           pkl-version: '0.27.1'
 
+      - name: Extract release tag
+        id: tag
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
       - name: Generate Pkl modules
-        run: make generate
+        run: make generate RELEASE_TAG=${{ steps.tag.outputs.tag }}
 
       - name: Resolve Pkl dependencies
         run: |
