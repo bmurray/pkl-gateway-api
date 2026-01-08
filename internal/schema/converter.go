@@ -66,17 +66,16 @@ type DynamicType struct{}
 
 func (DynamicType) PklType() string { return "Dynamic" }
 
-// EnumType represents a Pkl union of string literals.
+// EnumType represents a Pkl enum - using String for compatibility with optional rendering.
+// The allowed values are documented in comments.
 type EnumType struct {
 	Values []string
 }
 
 func (e EnumType) PklType() string {
-	quoted := make([]string, len(e.Values))
-	for i, v := range e.Values {
-		quoted[i] = fmt.Sprintf("%q", v)
-	}
-	return strings.Join(quoted, "|")
+	// Use String type for compatibility with optional properties and YAML rendering.
+	// Allowed values: documented in property description
+	return "String"
 }
 
 // ListingType represents a Pkl Listing<T>.
@@ -286,11 +285,16 @@ func (c *Converter) convertType(name string, schema *crd.OpenAPISchema) (Type, e
 }
 
 func (c *Converter) convertClass(name string, schema *crd.OpenAPISchema) (Class, error) {
+	return c.convertClassWithParent(name, schema)
+}
+
+func (c *Converter) convertClassWithParent(name string, schema *crd.OpenAPISchema) (Class, error) {
 	var properties []Property
 	var nestedClasses []Class
 
 	for propName, propSchema := range schema.Properties {
 		// For nested objects, we need to create nested classes with unique names
+		// Use current class name as parent context
 		typ, err := c.convertTypeForClass(name, propName, propSchema)
 		if err != nil {
 			return Class{}, fmt.Errorf("failed to convert property %s: %w", propName, err)
@@ -355,7 +359,8 @@ func (c *Converter) convertTypeForClass(parentClass, propName string, schema *cr
 		if schema.Items == nil {
 			return ListingType{ElementType: DynamicType{}}, nil
 		}
-		elemType, err := c.convertTypeForClass(parentClass, propName+"Item", schema.Items)
+		// Use parent+propName for array items to maintain context
+		elemType, err := c.convertTypeForClass(parentClass+toPklClassName(propName), "Item", schema.Items)
 		if err != nil {
 			return nil, err
 		}
@@ -371,12 +376,12 @@ func (c *Converter) convertTypeForClass(parentClass, propName string, schema *cr
 			return MappingType{ValueType: valueType}, nil
 		}
 
-		// Nested object - create a class
+		// Nested object - create a class with parent context to avoid name collisions
 		if len(schema.Properties) > 0 {
-			className := toPklClassName(propName)
+			className := toPklClassName(parentClass + toPklClassName(propName))
 			// Only add the class if we haven't seen it before
 			if !c.seenClasses[className] {
-				class, err := c.convertClass(className, schema)
+				class, err := c.convertClassWithParent(className, schema)
 				if err != nil {
 					return nil, err
 				}

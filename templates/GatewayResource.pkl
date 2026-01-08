@@ -56,5 +56,7 @@ fixed apiVersion: String
 fixed kind: String
 
 output {
-  renderer = new YamlRenderer {}
+  renderer = new YamlRenderer {
+    omitNullProperties = true
+  }
 }
