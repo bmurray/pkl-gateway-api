@@ -10,7 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkl-community/pkl-gateway-api/internal/schema"
+	"github.com/bmurray/pkl-gateway-api/internal/schema"
 )
 
 const licenseHeader = `//===----------------------------------------------------------------------===//

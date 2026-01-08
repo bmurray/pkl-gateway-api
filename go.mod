@@ -1,4 +1,4 @@
-module github.com/pkl-community/pkl-gateway-api
+module github.com/bmurray/pkl-gateway-api
 
 go 1.22
 

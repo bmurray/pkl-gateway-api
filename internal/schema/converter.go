@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/pkl-community/pkl-gateway-api/internal/crd"
+	"github.com/bmurray/pkl-gateway-api/internal/crd"
 )
 
 // Resource represents a Gateway API resource.

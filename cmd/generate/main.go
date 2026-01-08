@@ -10,27 +10,39 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/pkl-community/pkl-gateway-api/internal/crd"
-	"github.com/pkl-community/pkl-gateway-api/internal/generator"
-	"github.com/pkl-community/pkl-gateway-api/internal/schema"
+	"github.com/bmurray/pkl-gateway-api/internal/crd"
+	"github.com/bmurray/pkl-gateway-api/internal/generator"
+	"github.com/bmurray/pkl-gateway-api/internal/schema"
 )
 
 func main() {
 	version := flag.String("version", "v1.4.1", "Gateway API version to fetch")
 	k8sVersion := flag.String("k8s-version", "1.3.0", "pkl-k8s version to depend on")
+	pkgVersion := flag.String("pkg-version", "", "Package version (defaults to VERSION file)")
 	outputDir := flag.String("output", "generated-package", "Output directory for generated files")
 	templatesDir := flag.String("templates", "templates", "Directory containing base templates")
 	experimental := flag.Bool("experimental", false, "Include experimental resources")
 	flag.Parse()
 
-	if err := run(*version, *k8sVersion, *outputDir, *templatesDir, *experimental); err != nil {
+	// Read package version from VERSION file if not specified
+	pv := *pkgVersion
+	if pv == "" {
+		data, err := os.ReadFile("VERSION")
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error reading VERSION file: %v\n", err)
+			os.Exit(1)
+		}
+		pv = strings.TrimSpace(string(data))
+	}
+
+	if err := run(*version, *k8sVersion, pv, *outputDir, *templatesDir, *experimental); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func run(version, k8sVersion, outputDir, templatesDir string, experimental bool) error {
-	fmt.Printf("Generating Pkl modules for Gateway API %s\n", version)
+func run(version, k8sVersion, pkgVersion, outputDir, templatesDir string, experimental bool) error {
+	fmt.Printf("Generating Pkl modules for Gateway API %s (package version %s)\n", version, pkgVersion)
 
 	// Ensure output directory exists and is clean
 	if err := os.RemoveAll(outputDir); err != nil {
@@ -83,7 +95,7 @@ func run(version, k8sVersion, outputDir, templatesDir string, experimental bool)
 	}
 
 	// Convert CRDs to Resources and generate Pkl modules
-	gen := generator.NewGenerator(outputDir, strings.TrimPrefix(version, "v")+"0", k8sVersion)
+	gen := generator.NewGenerator(outputDir, pkgVersion, k8sVersion)
 	converter := schema.NewConverter()
 
 	var allResources []*schema.Resource
