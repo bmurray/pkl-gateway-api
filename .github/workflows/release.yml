@@ -25,12 +25,16 @@ jobs:
         with:
           pkl-version: '0.27.1'
 
-      - name: Extract release tag
-        id: tag
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Generate Pkl modules
-        run: make generate RELEASE_TAG=${{ steps.tag.outputs.tag }}
+        run: make generate
+
+      - name: Extract package version
+        id: version
+        run: |
+          # Extract version from generated PklProject
+          VERSION=$(grep 'version = ' generated-package/PklProject | sed 's/.*version = "\(.*\)"/\1/')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Package version: $VERSION"
 
       - name: Resolve Pkl dependencies
         run: |
@@ -45,8 +49,32 @@ jobs:
       - name: List generated files
         run: ls -la dist/
 
+      - name: Create package tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Delete existing tag if it exists (for re-releases)
+          git push origin :refs/tags/gateway-api@${{ steps.version.outputs.version }} || true
+          git tag -fa "gateway-api@${{ steps.version.outputs.version }}" -m "Gateway API package v${{ steps.version.outputs.version }}"
+          git push origin "gateway-api@${{ steps.version.outputs.version }}"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: gateway-api@${{ steps.version.outputs.version }}
+          name: gateway-api@${{ steps.version.outputs.version }}
           files: dist/*
-          generate_release_notes: true
+          body: |
+            Pkl templates for Kubernetes Gateway API v${{ steps.version.outputs.version }}
+
+            ## Installation
+
+            ```pkl
+            dependencies {
+              ["gateway-api"] {
+                uri = "package://pkg.pkl-lang.org/github.com/bmurray/pkl-gateway-api/gateway-api@${{ steps.version.outputs.version }}"
+              }
+            }
+            ```
+
+            Triggered by ${{ github.ref_name }}

@@ -18,29 +18,22 @@ import (
 func main() {
 	version := flag.String("version", "v1.4.1", "Gateway API version to fetch")
 	k8sVersion := flag.String("k8s-version", "1.3.0", "pkl-k8s version to depend on")
-	releaseTag := flag.String("release-tag", "", "Release tag for package URLs (required)")
 	outputDir := flag.String("output", "generated-package", "Output directory for generated files")
 	templatesDir := flag.String("templates", "templates", "Directory containing base templates")
 	experimental := flag.Bool("experimental", false, "Include experimental resources")
 	flag.Parse()
 
-	// Release tag is required
-	if *releaseTag == "" {
-		fmt.Fprintf(os.Stderr, "Error: --release-tag is required\n")
-		os.Exit(1)
-	}
-
 	// Package version is derived from Gateway API version (strip 'v' prefix)
 	pkgVersion := strings.TrimPrefix(*version, "v")
 
-	if err := run(*version, *k8sVersion, pkgVersion, *releaseTag, *outputDir, *templatesDir, *experimental); err != nil {
+	if err := run(*version, *k8sVersion, pkgVersion, *outputDir, *templatesDir, *experimental); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
 }
 
-func run(version, k8sVersion, pkgVersion, releaseTag, outputDir, templatesDir string, experimental bool) error {
-	fmt.Printf("Generating Pkl modules for Gateway API %s (package version %s, release tag %s)\n", version, pkgVersion, releaseTag)
+func run(version, k8sVersion, pkgVersion, outputDir, templatesDir string, experimental bool) error {
+	fmt.Printf("Generating Pkl modules for Gateway API %s (package version %s)\n", version, pkgVersion)
 
 	// Ensure output directory exists and is clean
 	if err := os.RemoveAll(outputDir); err != nil {
@@ -93,7 +86,7 @@ func run(version, k8sVersion, pkgVersion, releaseTag, outputDir, templatesDir st
 	}
 
 	// Convert CRDs to Resources and generate Pkl modules
-	gen := generator.NewGenerator(outputDir, pkgVersion, k8sVersion, releaseTag)
+	gen := generator.NewGenerator(outputDir, pkgVersion, k8sVersion)
 	converter := schema.NewConverter()
 
 	var allResources []*schema.Resource

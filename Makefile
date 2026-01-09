@@ -1,6 +1,5 @@
 VERSION ?= v1.4.1
 K8S_VERSION ?= 1.3.0
-RELEASE_TAG ?= dev
 OUTPUT_DIR ?= generated-package
 EXPERIMENTAL ?= false
 
@@ -8,9 +7,9 @@ EXPERIMENTAL ?= false
 
 generate: build
 ifeq ($(EXPERIMENTAL),true)
-	./bin/generate --version=$(VERSION) --k8s-version=$(K8S_VERSION) --release-tag=$(RELEASE_TAG) --output=$(OUTPUT_DIR) --experimental
+	./bin/generate --version=$(VERSION) --k8s-version=$(K8S_VERSION) --output=$(OUTPUT_DIR) --experimental
 else
-	./bin/generate --version=$(VERSION) --k8s-version=$(K8S_VERSION) --release-tag=$(RELEASE_TAG) --output=$(OUTPUT_DIR)
+	./bin/generate --version=$(VERSION) --k8s-version=$(K8S_VERSION) --output=$(OUTPUT_DIR)
 endif
 
 build:

@@ -14,7 +14,7 @@ Type-safe Pkl modules for Gateway API resources like HTTPRoute, Gateway, Gateway
 
 ### Add to Your PklProject
 
-Add both `k8s` and `k8s-gateway` to your `PklProject` file:
+Add both `k8s` and `gateway-api` to your `PklProject` file:
 
 ```pkl
 amends "pkl:Project"
@@ -23,8 +23,8 @@ dependencies {
   ["k8s"] {
     uri = "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.3.0"
   }
-  ["k8s-gateway"] {
-    uri = "package://github.com/bmurray/pkl-gateway-api/releases/download/v0.2.0/gateway-api@1.4.1"
+  ["gateway-api"] {
+    uri = "package://pkg.pkl-lang.org/github.com/bmurray/pkl-gateway-api/gateway-api@1.4.1"
   }
 }
 ```
@@ -39,10 +39,10 @@ pkl project resolve
 
 ### Create Resources Using Shortname Imports
 
-Example HTTPRoute configuration using the `@k8s-gateway` shortname:
+Example HTTPRoute configuration using the `@gateway-api` shortname:
 
 ```pkl
-amends "@k8s-gateway/gateway.networking.k8s.io/v1/HTTPRoute.pkl"
+amends "@gateway-api/gateway.networking.k8s.io/v1/HTTPRoute.pkl"
 
 metadata {
   name = "my-route"
@@ -133,11 +133,10 @@ spec:
 
 The package URI follows this format:
 ```
-package://github.com/bmurray/pkl-gateway-api/releases/download/{release-tag}/gateway-api@{gateway-api-version}
+package://pkg.pkl-lang.org/github.com/bmurray/pkl-gateway-api/gateway-api@{version}
 ```
 
-- **release-tag**: Our release version (e.g., `v0.2.0`)
-- **gateway-api-version**: The Gateway API version the templates are generated from (e.g., `1.4.1`)
+The version corresponds to the Gateway API version the templates are generated from (e.g., `1.4.1`).
 
 ## Development
 
@@ -150,13 +149,13 @@ package://github.com/bmurray/pkl-gateway-api/releases/download/{release-tag}/gat
 
 ```bash
 # Generate from Gateway API v1.4.1 (default)
-make generate RELEASE_TAG=v0.2.0
+make generate
 
 # Generate from a specific Gateway API version
-make generate VERSION=v1.3.0 RELEASE_TAG=v0.2.0
+make generate VERSION=v1.3.0
 
 # Include experimental resources (TCPRoute, TLSRoute, UDPRoute)
-make generate VERSION=v1.4.1 RELEASE_TAG=v0.2.0 EXPERIMENTAL=true
+make generate VERSION=v1.4.1 EXPERIMENTAL=true
 ```
 
 ### Project Structure

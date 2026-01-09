@@ -6,9 +6,9 @@
 /// - An HTTPRoute with multiple path-based routing rules
 module gateway
 
-import "@k8s-gateway/gateway.networking.k8s.io/v1/GatewayClass.pkl"
-import "@k8s-gateway/gateway.networking.k8s.io/v1/Gateway.pkl"
-import "@k8s-gateway/gateway.networking.k8s.io/v1/HTTPRoute.pkl"
+import "@gateway-api/gateway.networking.k8s.io/v1/GatewayClass.pkl"
+import "@gateway-api/gateway.networking.k8s.io/v1/Gateway.pkl"
+import "@gateway-api/gateway.networking.k8s.io/v1/HTTPRoute.pkl"
 
 output {
   value = resources
